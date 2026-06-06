@@ -5,7 +5,7 @@ Users can log daily expenses across categories, view monthly summaries, visualiz
 spending with charts, filter by category and date range, and export data as CSV.
 
 ## Live Demo
-- **Frontend:** https://mini-expense-tracker-b.vercel.app
+- **Frontend:** https://mini-expense-tracker-bay.vercel.app
 - **Backend API:** https://mini-expense-tracker-api-o0te.onrender.com
 
 ## Tech Stack
