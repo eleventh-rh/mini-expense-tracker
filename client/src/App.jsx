@@ -1,122 +1,80 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from 'react';
+import { useExpenses } from './hooks/useExpenses';
+import { getMonthStart, getToday } from './utils/currency';
+import ExpenseForm from './components/ExpenseForm';
+import ExpenseList from './components/ExpenseList';
+import FilterBar from './components/FilterBar';
+import SummaryPanel from './components/SummaryPanel';
+import CategoryChart from './components/CategoryChart';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const {
+    expenses, summary, loading, error,
+    fetchExpenses, addExpense, updateExpense, deleteExpense,
+  } = useExpenses();
+
+  const [editingExpense, setEditingExpense] = useState(null);
+  const [filters, setFilters] = useState({
+    category: 'All',
+    from: getMonthStart(),
+    to: getToday(),
+  });
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+    fetchExpenses(newFilters);
+  };
+
+  const handleEdit = (expense) => {
+    setEditingExpense(expense);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => setEditingExpense(null);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white shadow-sm">
+        <div className="max-w-5xl mx-auto px-4 py-4">
+          <h1 className="text-2xl font-bold text-gray-800">
+            💰 Mini Expense Tracker
+          </h1>
+          <p className="text-sm text-gray-500">Track your daily spending</p>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      </header>
 
-      <div className="ticks"></div>
+      <main className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            {error}
+          </div>
+        )}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        <ExpenseForm
+          onSubmit={editingExpense ?
+            (data) => updateExpense(editingExpense.id, data) :
+            addExpense}
+          editingExpense={editingExpense}
+          onCancel={handleCancelEdit}
+          loading={loading}
+        />
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <SummaryPanel summary={summary} />
+          <CategoryChart summary={summary} />
+        </div>
+
+        <FilterBar filters={filters} onFilterChange={handleFilterChange} />
+
+        <ExpenseList
+          expenses={expenses}
+          loading={loading}
+          onEdit={handleEdit}
+          onDelete={deleteExpense}
+        />
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;
