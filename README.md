@@ -11,7 +11,7 @@ spending with charts, filter by category and date range, and export data as CSV.
 ## Tech Stack
 - **Frontend:** React 18, Vite, Tailwind CSS, Recharts
 - **Backend:** Node.js, Express
-- **Storage:** JSON file (persistent across restarts)
+- **Storage:** JSON file (file-based persistence)
 - **Deployment:** Vercel (frontend), Render (backend)
 
 ## How to Run Locally
